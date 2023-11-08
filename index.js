@@ -1,13 +1,19 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
+const cookieParser= require('cookie-parser');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5000;
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+    origin: ['http://localhost:5173'],
+    credentials:true
+}));
 app.use(express.json());
+app.use(cookieParser());
 
 
 
@@ -25,6 +31,9 @@ const client = new MongoClient(uri, {
   }
 });
 
+
+
+
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -32,10 +41,36 @@ async function run() {
 
     const bannerCollection= client.db('data').collection('banner');
 
+
+    // Auth jwt related API
+
+    app.post('/jwt',  async(req, res)=>{
+        const user= req.body;
+        console.log(user);
+        const token=jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '2hr' })
+        console.log(token)
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', 
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            
+        }).send({success: true})
+    })
+
+   
+
+
+    
+
+    // /// Assignment related 
+
+    // Banner's data 
     app.get('/banners', async(req, res)=>{
         const cursor =await bannerCollection.find().toArray();
         res.send(cursor);
     })
+
+
 
 
     // Send a ping to confirm a successful connection
