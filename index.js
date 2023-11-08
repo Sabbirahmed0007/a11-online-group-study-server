@@ -30,7 +30,12 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
-   
+    const bannerCollection= client.db('data').collection('banner');
+
+    app.get('/banners', async(req, res)=>{
+        const cursor =await bannerCollection.find().toArray();
+        res.send(cursor);
+    })
 
 
     // Send a ping to confirm a successful connection
