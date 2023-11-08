@@ -123,12 +123,36 @@ async function run() {
         console.log(result);
         res.send(result);
     })
-
+        //create Assignment
     app.post('/createassignments', async(req, res)=>{
         const query= req.body;
         console.log(query);
         const result= await assignmentCollection.insertOne(query);
         res.send(result);
+    })
+
+    //Update the assignment data
+    app.put('/updateassignment/:id', async(req, res)=>{
+
+        const id= req.params.id;
+        const filter={_id: new ObjectId(id)};
+        const options= {upsert:true};
+        const updatedData= req.body;
+        const currentData={
+            $set:{
+                title: updatedData.title,
+                email: updatedData.email,
+                description: updatedData.description,
+                img: updatedData.img,
+                level: updatedData.level,
+                marks: updatedData.marks,
+                date: updatedData.date
+
+            }
+        }
+        const result= await assignmentCollection.updateOne(filter, currentData, options)
+        res.send(result);
+
     })
 
 
