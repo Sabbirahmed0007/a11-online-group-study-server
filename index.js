@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const cookieParser= require('cookie-parser');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5000;
@@ -108,6 +108,21 @@ async function run() {
     })
 
     // Assignments data
+
+    app.get('/allassignments', async(req, res)=>{
+        const cursor= await assignmentCollection.find().toArray();
+        res.send(cursor);
+    })
+
+    // single data for updating
+    app.get('/singleassignment/:id', async(req, res)=>{
+        const id= req.params.id;
+        console.log(id)
+        const query={ _id : new ObjectId(id)};
+        const result=await assignmentCollection.findOne(query);
+        console.log(result);
+        res.send(result);
+    })
 
     app.post('/createassignments', async(req, res)=>{
         const query= req.body;
