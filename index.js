@@ -66,6 +66,7 @@ async function run() {
     await client.connect();
 
     const bannerCollection= client.db('data').collection('banner');
+    const assignmentCollection= client.db('data').collection('assignment');
 
 
     // Auth jwt related API
@@ -104,6 +105,15 @@ async function run() {
     app.get('/banners', async(req, res)=>{
         const cursor =await bannerCollection.find().toArray();
         res.send(cursor);
+    })
+
+    // Assignments data
+
+    app.post('/createassignments', async(req, res)=>{
+        const query= req.body;
+        console.log(query);
+        const result= await assignmentCollection.insertOne(query);
+        res.send(result);
     })
 
 
