@@ -114,8 +114,21 @@ async function run() {
         res.send(cursor);
     })
 
+    // individual users's all assignment data
+    app.get('/myassignments', async(req, res)=>{
+        
+        let query={};
+        if(req.query?.email){
+            query= {email: req.query?.email}
+        }
+        const result = await assignmentCollection.find(query).toArray();
+        res.send(result);
+    })
+
     // single data for updating
     app.get('/singleassignment/:id', async(req, res)=>{
+
+
         const id= req.params.id;
         console.log(id)
         const query={ _id : new ObjectId(id)};
@@ -154,6 +167,34 @@ async function run() {
         res.send(result);
 
     })
+
+    // // Delete assignment
+    // app.delete('/allassignment/:id', async(req, res)=>{
+    //     const id = req.params.id;
+    //     const query = {_id: new ObjectId(id)};
+    //     const result= await assignmentCollection.deleteOne(query);
+    //     res.send(result);
+
+    // })
+
+    // Delete assignment
+app.delete('/allassignment/:id',gateMan, verifyToken, async (req, res) => {
+    const id = req.params.id;
+    const userEmail = req.user.email;
+    const query = { _id: new ObjectId(id), email: userEmail };
+    try {
+        const result = await assignmentCollection.deleteOne(query);
+        if (result.deletedCount > 0) {
+            res.send({ success: true, message: 'Assignment deleted successfully' });
+        } else {
+            res.status(404).send({ success: false, message: 'Assignment not found or unauthorized' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ success: false, message: 'Internal server error' });
+    }
+});
+
 
 
 
