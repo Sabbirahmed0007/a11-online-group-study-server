@@ -67,6 +67,8 @@ async function run() {
 
     const bannerCollection= client.db('data').collection('banner');
     const assignmentCollection= client.db('data').collection('assignment');
+    const featuresCollection= client.db('data').collection('featuresdata');
+    const faqCollection= client.db('data').collection('faq');
 
 
     // Auth jwt related API
@@ -107,12 +109,39 @@ async function run() {
         res.send(cursor);
     })
 
+    // Features data
+    app.get('/features', async(req, res)=>{
+        const query = await featuresCollection.find().toArray();
+        res.send(query);
+    })
+
+    // faq collection
+    app.get('/faqs', async(req, res)=>{
+        const query = await faqCollection.find().toArray();
+        res.send(query);
+    })
+
     // Assignments data
 
     app.get('/allassignments', async(req, res)=>{
-        const cursor= await assignmentCollection.find().toArray();
+        const page= parseInt(req.query.page);
+        const size= parseInt(req.query.size);
+        console.log('pagination query', req.query)
+
+        const cursor= await assignmentCollection.find().skip(page * size).limit(size).toArray();
         res.send(cursor);
     })
+
+
+    /// Pagination data
+
+    app.get('/assignmentCount', async(req, res)=>{
+        const count =await assignmentCollection.estimatedDocumentCount();
+        res.send({count});
+
+    })
+
+
 
     // individual users's all assignment data
     app.get('/myassignments', async(req, res)=>{
