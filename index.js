@@ -127,9 +127,16 @@ async function run() {
         const page= parseInt(req.query.page);
         const size= parseInt(req.query.size);
         console.log('pagination query', req.query)
+        const difficultyLevel = req.query.level;
 
-        const cursor= await assignmentCollection.find().skip(page * size).limit(size).toArray();
+        const query = difficultyLevel ? { level: difficultyLevel } : {}; 
+        
+        const cursor = await assignmentCollection.find(query).skip(page * size).limit(size).toArray();
         res.send(cursor);
+
+
+        // const cursor= await assignmentCollection.find().skip(page * size).limit(size).toArray();
+        // res.send(cursor);
     })
 
 
