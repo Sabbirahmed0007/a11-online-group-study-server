@@ -9,7 +9,7 @@ const port = process.env.PORT || 5000;
 
 // Middlewares
 app.use(cors({
-    origin: ['http://localhost:5173'],
+    origin: ['https://online-group-study-13dd6.web.app/'],
     credentials:true
 }));
 app.use(express.json());
