@@ -9,7 +9,7 @@ const port = process.env.PORT || 5000;
 
 // Middlewares
 app.use(cors({
-    origin: ['https://online-group-study-13dd6.web.app/'],
+    origin: ['https://online-group-study-13dd6.web.app', 'http://localhost:5173', 'https://wanting-beef.surge.sh'],
     credentials:true
 }));
 app.use(express.json());
@@ -63,7 +63,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const bannerCollection= client.db('data').collection('banner');
     const assignmentCollection= client.db('data').collection('assignment');
@@ -135,8 +135,6 @@ async function run() {
         res.send(cursor);
 
 
-        // const cursor= await assignmentCollection.find().skip(page * size).limit(size).toArray();
-        // res.send(cursor);
     })
 
 
@@ -151,8 +149,10 @@ async function run() {
 
 
     // individual users's all assignment data
-    app.get('/myassignments', async(req, res)=>{
-        
+    app.get('/myassignments',gateMan, verifyToken, async(req, res)=>{
+        if(req.query.email !== req.user.email){
+            return res.status(403).send({message: 'forbidden access'})
+        }
         let query={};
         if(req.query?.email){
             query= {email: req.query?.email}
@@ -236,7 +236,7 @@ app.delete('/allassignment/:id',gateMan, verifyToken, async (req, res) => {
 
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
